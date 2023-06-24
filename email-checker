@@ -1,0 +1,60 @@
+package main
+
+import(
+	"bufio"
+	"fmt"
+	"net"
+	"os"
+	"string"
+)
+
+func main(){
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print("domain, hasmx, hasSPF, spfRecord, dmarcRecord\n")
+	for scanner.Scan(){
+		checkDomain(scanner.Text())
+	}
+	if err:= scanner.Err(); err!=nil{
+		log.Fatal("Error: could not read fom input: %v\n", err)
+	}
+}
+
+func checkDomain(domain string){
+     var hasMX, hasSPF, hasDMARC bool
+	 var spfRecord, dmarcRecord string
+
+	 mxRecords, err := net.LookupMX(domain)
+
+	 if err!= nil{
+		log.Printf("Error: %v\n", err)
+	 }
+	 if len(mxRecords) > 0 {
+		hasMX = true
+	 }
+	 txtRecords, err := net.LookupTXT(domain)
+	 if err!= nil{
+		log.Printf("Error:%v\n",err)
+	 }
+
+	 for _,records:= randge txtRecords{
+		if strings.HasPrefix(records,"v=spf1"){
+			hasspf = true
+			spfRecord = record
+			break
+		}
+	 }
+
+	 dmarcRecords, err := net.LookupTXT("_dmarc." + domain)
+	 if err != nil{
+		log.Printf("ErrorL%v\n", err)
+	 }
+
+	 for _, record := range dmarcRecords{
+		if strings.HasPrefix(record, "v=DMARC1"){
+			hasDMARC = true
+			dmarcRecords = record
+			break
+		}
+	 }
+	 fmt.Printf("%v, %v, %v, %v,%v, %v",domain,hasMX,hasSPF,spfRecord,hasDMARC,dmarcRecord)
+}
